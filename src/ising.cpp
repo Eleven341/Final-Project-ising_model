@@ -13,7 +13,7 @@ IsingModel::IsingModel(int L, double J) : L(L), J(J) {
 // Compute the total energy of the system
 double IsingModel::computeEnergy() {
     double energy = 0;
-    for (int i = 0; i < L - 1; i++) {
+    for (int i = 0; i < L ; i++) {
         energy += -J * spins[i] * spins[i + 1];  // Neighbor interaction
     }
     return energy;
@@ -24,4 +24,13 @@ void IsingModel::printLattice() {
     for (int spin : spins)
         std::cout << (spin == 1 ? "+ " : "- "); // Use + to represent upwards arrow, - for downwards arrow
     std::cout << std::endl;
+}
+
+// Function to compute total magnetization of the system
+int IsingModel::computeMagnetization() {
+    int magnetization = 0;
+    for (int spin : spins) {
+        magnetization += spin;
+    }
+    return magnetization;
 }

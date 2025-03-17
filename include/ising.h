@@ -17,6 +17,9 @@ public:
 
     // Display spins
     void printLattice();
+
+    // Function to compute magnetization
+    int computeMagnetization();
 };
 
 #endif
