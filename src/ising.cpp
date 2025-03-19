@@ -53,7 +53,16 @@ double IsingModel::computeColumnEnergy() {
 
 // Compute total energy by summing row and column energy
 double IsingModel::computeTotalEnergy() {
-    double totalEnergy = computeRowEnergy() + computeColumnEnergy();
+    double rowEnergy = computeRowEnergy();
+    double columnEnergy = computeColumnEnergy();
+    double totalEnergy = rowEnergy + columnEnergy;
+
+    // DEBUG: Print energy values to compare with 1D version
+    std::cout << "[DEBUG] Total Energy: " << totalEnergy 
+              << " (Row Energy: " << rowEnergy 
+              << ", Column Energy: " << columnEnergy << ")\n";
+
+
     return totalEnergy;
 }
 
