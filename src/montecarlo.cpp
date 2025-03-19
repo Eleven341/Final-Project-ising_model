@@ -6,7 +6,7 @@ Montecarlo::Montecarlo(double beta) : beta(beta) {}
 
 void Montecarlo::step(IsingModel &model) {
     int R = model.R;  // Number of rows
-    int L = model.C;  // Number of columns
+    int L = model.L;  // Number of columns
     int r = rand() % R; // Pick a random row
     int c = rand() % L; // Pick a random column
 

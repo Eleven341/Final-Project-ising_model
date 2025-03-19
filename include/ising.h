@@ -4,22 +4,19 @@
 #include <vector>
 
 class IsingModel {
-public:
-    int L;                        // Number of spins in the system
-    std::vector<int> spins;       // Array of spins (+1 or -1)
-    double J;                     // Interaction strength
-
-    // Constructor
-    IsingModel(int L, double J);
-
-    // Compute total energy of the system
-    double computeEnergy();
-
-    // Display spins
-    void printLattice();
-
-    // Function to compute magnetization
-    int computeMagnetization();
-};
+    public:
+        int R, C; // Rows and Columns for 2D Ising model
+        std::vector<std::vector<int>> spins; // 2D array of spins
+        double J; // Interaction strength
+    
+        IsingModel(int R, int C, double J); // Constructor matching ising.cpp
+    
+        double computeRowEnergy(); // Computes energy contribution from rows
+        double computeColumnEnergy(); // Computes energy contribution from columns
+        double computeTotalEnergy(); // Computes total energy
+    
+        int computeMagnetization(); // Computes magnetization
+        void printLattice(); // Prints the spin configuration
+    };
 
 #endif
