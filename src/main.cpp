@@ -13,7 +13,7 @@ int main()
     srand(time(0));  // Seed the RNG with the current time    
     int R, C;
     double J = 1.0, beta;
-    int steps = 9000000;
+    int steps = 100000;
 
     // Ask user for input grid size
     std::cout << "Enter number of rows (R): ";
@@ -43,7 +43,7 @@ int main()
         mc.step(model);  // Perform a single Monte Carlo step
         
         // Record energy and magnetization every 1000 steps
-        if (i % 30000 == 0)
+        if (i % 1000 == 0)
         {
             double energy = model.computeTotalEnergy();
             int magnetization = model.computeMagnetization();
