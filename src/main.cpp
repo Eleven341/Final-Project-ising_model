@@ -4,12 +4,16 @@
 #include <vector>
 #include <cmath> // For fabs()
 #include <cfloat> // For double limits
+#include <fstream>
+#include <ctime>
+
 
 int main()
 {
+    srand(time(0));  // Seed the RNG with the current time    
     int R, C;
     double J = 1.0, beta;
-    int steps = 100000;
+    int steps = 9000000;
 
     // Ask user for input grid size
     std::cout << "Enter number of rows (R): ";
@@ -37,9 +41,9 @@ int main()
     for (int i = 0; i < steps; i++)
     {
         mc.step(model);  // Perform a single Monte Carlo step
-
+        
         // Record energy and magnetization every 1000 steps
-        if (i % 1000 == 0)
+        if (i % 30000 == 0)
         {
             double energy = model.computeTotalEnergy();
             int magnetization = model.computeMagnetization();
@@ -84,6 +88,17 @@ int main()
             }
         }
     }
+    // Save results to CSV after full simulation
+std::ofstream outFile("ising_single_run.csv");
+outFile << "Step,Energy,Magnetization\n";
+
+for (int i = 0; i < energy_history.size(); ++i) {
+    outFile << (i * 1000) << "," << energy_history[i] << "," << magnetization_history[i] << "\n";
+}
+
+outFile.close();
+std::cout << "Results saved to ising_single_run.csv\n";
+
 
     // Print final results
     std::cout << "Final Spin Configuration:\n";

@@ -17,39 +17,72 @@ IsingModel::IsingModel(int R, int C, double J) : R(R), C(C), J(J) {
     }
 }
 
-// Compute energy due to row interactions
 double IsingModel::computeRowEnergy() {
     double rowEnergy = 0.0;
-    int i = 0; // Row iterator
 
-    do {
-        for (int j = 0; j < C; j++) {
-            int S = spins[i][j];
-            int right = spins[i][(j + 1) % C]; // Right neighbor
+    // Here we consider 2 case here is consider we have a 1D model
+    if (R == 1) { 
+        for (int j = 0; j < C - 1; j++) {
+            int S = spins[0][j];
+            int right = spins[0][j + 1];
             rowEnergy += -J * S * right;
+    
         }
-        i++;
-    } while (i < R); // Continue for all rows
+    }
+    
+
+    // Here consider 2D model
+    else {
+        // Standard 2D case
+        int i = 0; // Row iterator
+        do {
+            for (int j = 0; j < C; j++) {
+                int S = spins[i][j];
+                int right = spins[i][(j + 1) % C]; // Right neighbor (wrap around in 2D)
+                rowEnergy += -J * S * right;
+            }
+            i++;
+        } while (i < R); // Continue for all rows
+    }
 
     return rowEnergy;
 }
 
-// Compute energy due to column interactions
+// Same here we consider 2 cases 1D or 2D input
 double IsingModel::computeColumnEnergy() {
     double columnEnergy = 0.0;
-    int j = 0; // Column iterator 
-
-    do {
-        for (int i = 0; i < R; i++) {
-            int S = spins[i][j];
-            int down = spins[(i + 1) % R][j]; // Bottom neighbor 
+    
+    if (R == 1) {
+        // No vertical neighbors in 1D row case
+        return 0.0;
+    }
+    // 1D case
+    if (C == 1) { 
+        // If there's only one column (1D case), avoid accessing out-of-bounds column indices
+        for (int i = 0; i < R - 1; i++) { // Ensure we don't go out of bounds
+            int S = spins[i][0];
+            int down = spins[i + 1][0]; // Bottom neighbor
             columnEnergy += -J * S * down;
         }
-        j++;
-    } while (j < C); // Continue for all columns
+    } 
+
+    // 2D case
+    else {
+        // Standard 2D case
+        int j = 0; // Column iterator
+        do {
+            for (int i = 0; i < R; i++) {
+                int S = spins[i][j];
+                int down = spins[(i + 1) % R][j]; // Bottom neighbor (wrap around in 2D)
+                columnEnergy += -J * S * down;
+            }
+            j++;
+        } while (j < C); // Continue for all columns
+    }
 
     return columnEnergy;
 }
+
 
 // Compute total energy by summing row and column energy
 double IsingModel::computeTotalEnergy() {
@@ -57,10 +90,7 @@ double IsingModel::computeTotalEnergy() {
     double columnEnergy = computeColumnEnergy();
     double totalEnergy = rowEnergy + columnEnergy;
 
-    // DEBUG: Print energy values to compare with 1D version
-    std::cout << "[DEBUG] Total Energy: " << totalEnergy 
-              << " (Row Energy: " << rowEnergy 
-              << ", Column Energy: " << columnEnergy << ")\n";
+  
 
 
     return totalEnergy;
