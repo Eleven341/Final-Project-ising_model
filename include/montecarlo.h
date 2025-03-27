@@ -1,14 +1,14 @@
-#ifndef MONTECARLO_H
+#ifndef MONTECARLO_H  // Prevent multiple inclusion of this header file
 #define MONTECARLO_H
-
-#include "ising.h"
+#include "ising.h" // Include header file
 
 class Montecarlo {
 public:
-    double beta;  // Temperature (1/kT)
-
     Montecarlo(double beta);  // Constructor
     void step(IsingModel &model);  // Performs a Monte Carlo step
+
+private:
+    double beta;  // Temperature 
 };
 
 #endif
