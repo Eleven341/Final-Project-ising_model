@@ -1,4 +1,4 @@
-#include "../include/montecarlo.h"
+#include "../include/montecarlo.h" // Include header file
 #include <cmath> // Include for exp()
 #include <cstdlib> // For random number generation (rand())
 #include <iostream> // For console output

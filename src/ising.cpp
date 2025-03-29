@@ -1,12 +1,12 @@
 #include "../include/ising.h" // include header file
-#include <iostream>
+#include <iostream> // Required for std::cout
 #include <cstdlib> // For rand()
 #include <cmath>   // For fabs()
 
 // Constructor: Initializes a 2D/1D spin lattice of size R x C
 IsingModel::IsingModel(int R, int C, double J) : R(R), C(C), J(J) {
     
-    // Resize for both low dimension array (vector) or higher dimension array(matrix)
+    // Resize for both low dimension array(vector) or higher dimension array(matrix)
     spins.resize(R, std::vector<int>(C));
 
     // Construct lattice randomly with +1 or -1
@@ -27,8 +27,8 @@ double IsingModel::computeRowEnergy() {
     if (R == 1) { 
         for (int j = 0; j < C - 1; j++) {
             int S = spins[0][j];
-            int right = spins[0][j + 1];
-            rowEnergy += -J * S * right;
+            int right = spins[0][j + 1]; // Right neighbour
+            rowEnergy += -J * S * right; // Formula for computing energy
     
         }
     }
@@ -42,7 +42,7 @@ double IsingModel::computeRowEnergy() {
             for (int j = 0; j < C; j++) {
                 int S = spins[i][j];
                 int right = spins[i][(j + 1) % C]; // Right neighbor
-                rowEnergy += -J * S * right;
+                rowEnergy += -J * S * right; // Formula for computing energy
             }
             i++;
         } while (i < R); // Continue for all rows (Also prevent out of bound of the matrix)
@@ -69,7 +69,7 @@ double IsingModel::computeColumnEnergy() {
         for (int i = 0; i < R - 1; i++) { // Ensure we don't go out of bounds
             int S = spins[i][0];
             int down = spins[i + 1][0]; // Bottom neighbor
-            columnEnergy += -J * S * down;
+            columnEnergy += -J * S * down; // Formula for computing energy
         }
     } 
 
@@ -81,7 +81,7 @@ double IsingModel::computeColumnEnergy() {
             for (int i = 0; i < R; i++) {
                 int S = spins[i][j];
                 int down = spins[(i + 1) % R][j]; // Bottom neighbor (wrap around in 2D)
-                columnEnergy += -J * S * down;
+                columnEnergy += -J * S * down; // Formula for computing energy
             }
             j++;
         } while (j < C); // Continue for all columns (Prevent out of bound of the matrix)
@@ -105,7 +105,7 @@ int IsingModel::computeMagnetization() {
     int magnetization = 0;
     for (int i = 0; i < R; i++) {
         for (int j = 0; j < C; j++) {
-            magnetization += spins[i][j];
+            magnetization += spins[i][j]; // Add the spin value (+1 or -1) to total
         }
     }
     return magnetization;
@@ -115,7 +115,7 @@ int IsingModel::computeMagnetization() {
 void IsingModel::printLattice() {
     for (int i = 0; i < R; i++) {
         for (int j = 0; j < C; j++) {
-            std::cout << (spins[i][j] == 1 ? "+ " : "- "); // Print + for spin up (+1), - for spin down (-1)
+            std::cout << (spins[i][j] == 1 ? "+ " : "- "); // Print + for spin up (+1), - for spin down (-1) 
         }
         std::cout << std::endl;
     }

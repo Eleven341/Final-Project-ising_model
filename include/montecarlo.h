@@ -8,7 +8,7 @@ public:
     void step(IsingModel &model);  // Performs a Monte Carlo step
 
 private:
-    double beta;  // Temperature 
+    double beta;  // Inverse temperature 
 };
 
 #endif

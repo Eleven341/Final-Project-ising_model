@@ -1,6 +1,6 @@
 #ifndef ISING_H // Check if ISING_H is not defined
 #define ISING_H // Avoiding duplicate definitions
-#include <vector>
+#include <vector> // For vector manipulation
 
 class IsingModel {
     public: // Accessible by external code

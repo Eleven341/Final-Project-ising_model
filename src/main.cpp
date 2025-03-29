@@ -1,7 +1,7 @@
 // Include both header files
-#include "ising.h"
-#include "montecarlo.h"
-#include <iostream>
+#include "ising.h" // Include header file
+#include "montecarlo.h" // Include header file
+#include <iostream> // For std::cout
 #include <vector>  // For using std::vector container
 #include <cmath>   // Include for fabs()
 #include <cfloat>  // For double limits
@@ -9,11 +9,13 @@
 #include <ctime>   // For random seed to follow current time (prevent same random stuff everytime)
 #include <numeric> // Used to compute sum
 #include <sstream> // Used to build filenames like "frame_1.csv" (GIF)
+#include <string>  // Used to create output path
+#include <filesystem> // For creating directories and managing files
+
 
 // Compute average
 double compute_mean(const std::vector<double> &values)
 {
-
     // Accumulate the sum of all elements in the vector
     double sum = std::accumulate(values.begin(), values.end(), 0.0);
     return sum / values.size(); // Divide by numbers of elements
@@ -69,7 +71,16 @@ int main()
     srand(time(0));       // Seed the RNG with the current time
     int R, C;             // User input for row and column
     double J = 1.0, beta; // Parameter that we need
-    int steps = 15000000; // Numbers of time of performing Monte Carlo for 1 configuration
+    int steps = 150000;   // Numbers of time of performing Monte Carlo for 1 configuration
+
+    // Set output folder for saving all results
+    std::string output_dir = "Results_100x100/";
+
+    // Create frame and PNG folders (for GIF) if they don't exist
+    std::string frame_folder = output_dir + "frames_100x100";
+    std::string png_folder = output_dir + "frames_png_100x100";
+    std::filesystem::create_directories(frame_folder);
+    std::filesystem::create_directories(png_folder);
 
     // Ask user for input grid size
     std::cout << "Enter number of rows (R): ";
@@ -78,6 +89,10 @@ int main()
     std::cin >> C;
     std::cout << "Enter beta value: ";
     std::cin >> beta;
+
+    // Create necessary folders to store simulation frames and PNG images
+    std::filesystem::create_directories(output_dir + "frames_100x100");
+    std::filesystem::create_directories(output_dir + "frames_png_100x100");
 
     // Initialize model with user-specified size and perform Monte Carlo with user-specified beta
     IsingModel model(R, C, J);
@@ -92,13 +107,22 @@ int main()
     std::vector<int> magnetization_history;
     bool stabilized = false; // Track stabilization
 
+    // Clear all files inside the "frames_RxC" directory before running the simulation
+    for (const auto &entry : std::filesystem::directory_iterator(frame_folder)) {
+        std::filesystem::remove(entry);
+    }
+
+    // Clear all files inside the "frames_png_RxC" directory before running the simulation
+    for (const auto &entry : std::filesystem::directory_iterator(png_folder)) {
+        std::filesystem::remove(entry);
+    }
     // Perform Montel Carlo
     for (int i = 0; i < steps; i++)
     {
         mc.step(model); // Perform a single Monte Carlo step
 
-        // Record energy and magnetization every 1000000 steps
-        if (i % 1000000 == 0)
+        // Record energy and magnetization every 2000 steps (could be edit by user)
+        if (i % 2000 == 0)
         {
             double energy = model.computeTotalEnergy();
             int magnetization = model.computeMagnetization();
@@ -109,21 +133,20 @@ int main()
             std::cout << "Step " << i << " - Energy: " << energy
                       << ", Magnetization: " << magnetization << std::endl;
 
-
             // Below code chunk is for smoother GIF
-            int subframes = 5; // Number of additional spin snapshots per 1000000 steps
+            int subframes = 5; // Number of additional spin snapshots per 200000 steps
 
             for (int k = 0; k < subframes; ++k)
             {
-                // Perform mini-steps in between frames
-                for (int j = 0; j < 1000000 / subframes; ++j)
+                // Perform mini-steps in between frames (could be edit by user)
+                for (int j = 0; j < 2000 / subframes; ++j)
                 {
                     mc.step(model); // Keep evolving the system
                 }
 
                 // Save subframe
                 std::ostringstream filename;
-                filename << "frames/frame_" << (i / 1000000) * subframes + k << ".csv";
+                filename << output_dir << "frames_100x100/frame_" << (i / 2000) * subframes + k << ".csv"; // 2000 here could be edit by user
 
                 // Save the current spin configuration to a CSV file
                 std::ofstream frameFile(filename.str());
@@ -145,7 +168,7 @@ int main()
             {
                 double avg_energy = 0, avg_mag = 0, max_energy_change = 0;
 
-                // Compute average energy and magnetization over last 5000000 steps
+                // Compute average energy and magnetization over last 5 entries
                 for (int j = energy_history.size() - 5; j < energy_history.size(); j++)
                 {
                     avg_energy += energy_history[j];
@@ -177,14 +200,14 @@ int main()
     }
 
     // Save results to CSV after full simulation
-    std::ofstream outFile("ising_single_run.csv");
+    std::ofstream outFile(output_dir + "ising_single_run_100x100.csv");
     outFile << "Step,Energy,Magnetization\n";
     for (int i = 0; i < energy_history.size(); ++i)
     {
         outFile << (i * 1000) << "," << energy_history[i] << "," << magnetization_history[i] << "\n";
     }
     outFile.close();
-    std::cout << "Results saved to ising_single_run.csv\n";
+    std::cout << "Results saved to ising_single_run_100x100.csv\n";
 
     // Print final results
     std::cout << "Final Spin Configuration:\n";
@@ -195,28 +218,28 @@ int main()
 
     std::vector<double> beta_values = {0.5, 1, 5, 10, 15, 20}; // Different beta that we will test on
 
-    // Number of independent simulation runs for each beta value
-    int num_runs = 50;
+    // Number of independent simulation runs for each beta value (could be change by user)
+    int num_runs = 100;
 
     // Open CSV file to save averaged results across beta values
-    std::ofstream summaryFile("ising_averaged_results.csv");
+    std::ofstream summaryFile(output_dir + "ising_averaged_results_100x100.csv");
     summaryFile << "Beta,AvgEnergy,StdEnergy,AvgMagnetization,StdMagnetization\n";
 
     // New file to store all individual results for distribution plots
-    std::ofstream allRunsFile("ising_all_runs.csv");
+    std::ofstream allRunsFile(output_dir + "ising_all_runs_100x100.csv");
     allRunsFile << "Beta,Energy,Magnetization\n"; // header row
 
     // Loop over each beta value
     for (double beta_val : beta_values)
     {
-        std::vector<double> energies;
-        std::vector<double> magnetizations;
+        std::vector<double> energies; // Empty ector to store double value
+        std::vector<double> magnetizations; // Empty ector to store double value
 
         // Repeat simulation for num_runs(100) times for statistical averaging
         for (int run = 0; run < num_runs; ++run)
         {
             IsingModel simModel(R, C, J); // Initialize new random spin configuration
-            Montecarlo simMC(beta_val);
+            Montecarlo simMC(beta_val); // Peform Montecarlo
 
             // Perform Monte Carlo simulation for the given number of steps for each configuration
             for (int step = 0; step < steps; ++step)
@@ -235,7 +258,7 @@ int main()
             allRunsFile << beta_val << "," << E << "," << M << "\n";
         }
 
-        // Compute average and standard deviation of energy and magnetization of 100 different configurations for each beta
+        // Compute average and standard deviation of energy and magnetization of 1000 different configurations for each beta
         double mean_E = compute_mean(energies);
         double std_E = compute_std(energies, mean_E);
         double mean_M = compute_mean(magnetizations);
@@ -249,7 +272,7 @@ int main()
     }
 
     summaryFile.close();
-    std::cout << "Averaged results saved to ising_averaged_results.csv\n";
+    std::cout << "Averaged results saved to ising_averaged_results_100x100.csv\n";
 
     return 0;
 }
